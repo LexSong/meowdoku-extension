@@ -107,9 +107,21 @@ function regionIndexOf(cell) {
   return idx === undefined ? -1 : idx;
 }
 
+// game.js hands out region ids in order, and PALETTE walks its two rings in
+// hue order, so id N and id N+1 landed on adjacent hues — the two hardest
+// colours to tell apart next to each other on the board. Stepping by 7
+// instead of 1 fixes that: 7 is coprime with the 12-colour palette, so the
+// sequence visits every hue and alternates rings before it repeats, and
+// consecutive ids always land 5 (or 7) slots apart — the largest gap a
+// 12-colour cycle can give two neighbours. A per-game random shuffle can't
+// promise that; it can just as easily deal two adjacent hues to two
+// consecutive ids as this stride never does.
+const PALETTE_STRIDE = 7;
+
 function colorFor(idx, cell) {
+  const slot = (idx * PALETTE_STRIDE) % PALETTE.length;
   const palette = cell.dataset.state === "1" ? DIMMED_PALETTE : PALETTE;
-  return palette[idx % palette.length];
+  return palette[slot];
 }
 
 function applyState(cell) {
