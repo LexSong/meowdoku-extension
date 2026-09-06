@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="screenshots/12x12.png" alt="12 x 12 board with the extension applied">
+</p>
+
 # Meowdoku Restyle
 
 A Chrome extension that restyles <https://yocox.github.io/meowdoku/>. It changes
