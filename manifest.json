@@ -1,0 +1,13 @@
+{
+  "manifest_version": 3,
+  "name": "Meowdoku Restyle",
+  "version": "1.0.0",
+  "description": "Rounds cell corners as a percentage of cell size and dims crossed-out cells.",
+  "content_scripts": [
+    {
+      "matches": ["https://yocox.github.io/meowdoku/*"],
+      "css": ["restyle.css"],
+      "run_at": "document_end"
+    }
+  ]
+}

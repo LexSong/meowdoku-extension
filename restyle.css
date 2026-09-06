@@ -1,0 +1,33 @@
+/* Meowdoku Restyle — page overrides.
+   The page's own rules have the same specificity, and Chrome does not
+   guarantee that an extension stylesheet lands after the page's, so every
+   override here is !important. */
+
+:root {
+  /* Corner radius of a cell, as a percentage of the cell's own width. The
+     page uses a flat 10px, which rounds every board the same amount
+     regardless of size: a cell is 40px wide at 12 x 12 but 85px at 6 x 6, so
+     a flat radius gets less round exactly where cells get bigger. A
+     percentage resolves against the cell's own box, so it holds one shape at
+     every size. */
+  --md-radius: 10%;
+  /* Brightness applied to a crossed-out cell. 1 leaves it unchanged. */
+  --md-mark-dim: 0.5;
+}
+
+/* Cell roundness.
+   Three rules carry the radius — the cell, the hover/press overlay and the
+   wrong-guess overlay — and they have to move together or the overlays sit
+   proud of the corner they cover. */
+.cell,
+.cell:hover::after,
+.cell.active::after,
+.cell[data-state="4"]::after {
+  border-radius: var(--md-radius) !important;
+}
+
+/* Crossed-out cells are dimmed, so a ruled-out cell reads as visually
+   different from a live one at a glance. */
+.cell[data-state="1"] {
+  filter: brightness(var(--md-mark-dim)) !important;
+}
