@@ -17,6 +17,23 @@ nothing about the rules or the logic, only how the board looks.
 2. **Crossed-out cells are dimmed.** A cell marked with an X drops to half
    brightness, so every ruled-out cell reads as visually distinct from a live
    one at a glance.
+3. **A twelve-colour region palette**, replacing the site's own. Two rings of
+   six, taken from `D:\palette-lab\results\6+6-sharedC.json`.
+
+## How a region is recognised
+
+`game.js` writes each region's colour as an inline style and keeps its
+palette in a top-level `const`, which never reaches `window`. So there is
+nothing to patch: the extension reads each cell's inline colour back, looks
+it up in `ORIGINAL_PALETTES`, and overwrites it.
+
+That makes the site's palette a hard dependency. `ORIGINAL_PALETTES` holds
+the current palette and the one it replaced in a September 2026 update, so a
+browser still serving a cached `game.js` works too.
+
+**If regions stop being recoloured after a site update, check this first.**
+Diff `REGION_COLORS` in `game.js` against `ORIGINAL_PALETTES` and prepend the
+new array.
 
 ## Install
 
@@ -30,6 +47,8 @@ nothing about the rules or the logic, only how the board looks.
 `restyle.css` holds `--md-radius` (cell corner radius, 10% of cell width
 against the page's flat 10px) and `--md-mark-dim` (brightness of a crossed-out
 cell).
+
+`restyle.js` holds `PALETTE`, indexed by region id.
 
 Three rules carry the cell radius — the cell itself, the hover/press overlay
 and the wrong-guess overlay — and the stylesheet moves all three together.
