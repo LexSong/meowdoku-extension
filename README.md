@@ -14,9 +14,12 @@ nothing about the rules or the logic, only how the board looks.
    quarter of the small cell and an eighth of the large one — it gets less
    round exactly where cells get bigger. A percentage holds one shape at every
    size.
-2. **Crossed-out cells are dimmed.** A cell marked with an X drops to half
-   brightness, so every ruled-out cell reads as visually distinct from a live
-   one at a glance.
+2. **Crossed-out cells are dimmed.** A cell marked with an X drops both
+   brightness and saturation to 70%, so every ruled-out cell reads as visually
+   distinct from a live one at a glance. Brightness alone preserves hue, and
+   the palette pairs each pale hue with a nearby vivid one, so a dimmed pale
+   cell could otherwise land on the live vivid cell at the same hue —
+   saturation has to drop alongside it, not brightness on its own.
 3. **A twelve-colour region palette**, replacing the site's own. Two rings of
    six, taken from `D:\palette-lab\results\6+6-sharedC.json`.
 
@@ -45,8 +48,8 @@ new array.
 ## Tuning
 
 `restyle.css` holds `--md-radius` (cell corner radius, 10% of cell width
-against the page's flat 10px) and `--md-mark-dim` (brightness of a crossed-out
-cell).
+against the page's flat 10px), `--md-mark-dim` (brightness of a crossed-out
+cell) and `--md-mark-sat` (its saturation).
 
 `restyle.js` holds `PALETTE`, indexed by region id.
 

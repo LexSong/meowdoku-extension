@@ -11,8 +11,14 @@
      percentage resolves against the cell's own box, so it holds one shape at
      every size. */
   --md-radius: 10%;
-  /* Brightness applied to a crossed-out cell. 1 leaves it unchanged. */
-  --md-mark-dim: 0.5;
+  /* Brightness applied to a crossed-out cell. 1 leaves it unchanged. Brightness
+     alone preserves hue, and the palette pairs each pale hue with a vivid one
+     close by, so a dimmed pale cell can land on the live vivid cell of the
+     same hue — saturation has to drop alongside it, not brightness on its
+     own. */
+  --md-mark-dim: 0.7;
+  /* Saturation applied alongside the dim, for the same reason. */
+  --md-mark-sat: 0.5;
 }
 
 /* Cell roundness.
@@ -26,8 +32,8 @@
   border-radius: var(--md-radius) !important;
 }
 
-/* Crossed-out cells are dimmed, so a ruled-out cell reads as visually
-   different from a live one at a glance. */
+/* Crossed-out cells drop both brightness and saturation, so a ruled-out cell
+   reads as visually different from a live one at a glance. */
 .cell[data-state="1"] {
-  filter: brightness(var(--md-mark-dim)) !important;
+  filter: brightness(var(--md-mark-dim)) saturate(var(--md-mark-sat)) !important;
 }
