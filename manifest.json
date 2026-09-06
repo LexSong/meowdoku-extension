@@ -1,18 +1,12 @@
 {
   "manifest_version": 3,
   "name": "Meowdoku Restyle",
-  "version": "1.3.0",
-  "description": "Rounds cell corners as a percentage of cell size, dims crossed-out cells in OKLab, and repaints regions on a choice of two-ring palettes.",
-  "permissions": ["storage"],
-  "action": {
-    "default_popup": "popup.html",
-    "default_title": "Meowdoku Restyle"
-  },
+  "version": "1.4.0",
+  "description": "Rounds cell corners as a percentage of cell size instead of the page's flat 10px.",
   "content_scripts": [
     {
       "matches": ["https://yocox.github.io/meowdoku/*"],
       "css": ["restyle.css"],
-      "js": ["palettes.js", "restyle.js"],
       "run_at": "document_end"
     }
   ]
