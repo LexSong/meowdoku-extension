@@ -27,11 +27,11 @@ for (const palette of ORIGINAL_PALETTES) {
   });
 }
 
-// Twelve colours, two rings of six, from D:\palette-lab\results\6+6-sharedC.json.
-const PALETTE = [
-  "#ff9ca9", "#f5aa6b", "#bdc567", "#56d6bc", "#61cbfb", "#c7acff",
-  "#ab505e", "#a45c1d", "#777600", "#00865c", "#007aad", "#7a60ad",
-];
+// The active region palette, one of the named entries in palettes.js
+// (loaded before this file). Starts on the default and is replaced once
+// chrome.storage reports the user's saved choice, or whenever the popup
+// changes it — see the chrome.storage.onChanged listener below.
+let PALETTE = PALETTES[DEFAULT_PALETTE_KEY].colors;
 
 // A crossed-out cell dims by scaling OKLab lightness and chroma, not by
 // CSS `filter: brightness() saturate()`. That filter works in sRGB, so on a
@@ -98,7 +98,13 @@ function dim(hex) {
   });
 }
 
-const DIMMED_PALETTE = PALETTE.map(dim);
+let DIMMED_PALETTE = PALETTE.map(dim);
+
+function setPalette(key) {
+  const entry = PALETTES[key] || PALETTES[DEFAULT_PALETTE_KEY];
+  PALETTE = entry.colors;
+  DIMMED_PALETTE = PALETTE.map(dim);
+}
 
 function regionIndexOf(cell) {
   const m = cell.style.backgroundColor.match(/\d+/g);
@@ -168,4 +174,25 @@ if (board) {
   });
 
   repaint(board);
+
+  // Cells painted above used the default palette, since chrome.storage
+  // hasn't reported the user's saved choice yet. Re-paint them once it has,
+  // and again whenever the popup changes it while this tab is open.
+  function repaintAll() {
+    for (const cell of board.querySelectorAll(".cell")) {
+      if (cell.dataset.mdRegion !== undefined) applyState(cell);
+    }
+  }
+
+  chrome.storage.local.get(["paletteKey"], (result) => {
+    setPalette(result.paletteKey);
+    repaintAll();
+  });
+
+  chrome.storage.onChanged.addListener((changes, area) => {
+    if (area === "local" && changes.paletteKey) {
+      setPalette(changes.paletteKey.newValue);
+      repaintAll();
+    }
+  });
 }

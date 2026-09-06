@@ -26,13 +26,17 @@ nothing about the rules or the logic, only how the board looks.
    OKLab separates lightness from chroma along perceptual axes, so scaling
    each on its own keeps the hue intact and keeps a crossed-out cell
    recognisable as its region.
-3. **A twelve-colour region palette**, replacing the site's own. Two rings of
-   six, taken from `D:\palette-lab\results\6+6-sharedC.json`, assigned to
-   region ids with a stride of 7 rather than in array order — game.js hands
-   out ids in order, and the palette walks its two rings in hue order, so
-   assigning it straight would put adjacent hues on adjacent ids. Stepping by
-   7 (coprime with the 12-colour palette) spaces consecutive ids 5 slots
-   apart every time, which a per-game random shuffle can't promise.
+3. **A twelve-colour region palette**, replacing the site's own. Two rings —
+   6+6 by default, from `D:\palette-lab\results\6+6-sharedC.json`, or 5+7,
+   from `D:\palette-lab\results\5+7-sharedC.json` — assigned to region ids with a
+   stride of 7 rather than in array order. game.js hands out ids in order,
+   and each palette walks its rings in hue order, so assigning it straight
+   would put adjacent hues on adjacent ids. Stepping by 7 (coprime with the
+   12-colour palette) spaces consecutive ids 5 slots apart every time, which
+   a per-game random shuffle can't promise.
+4. **A palette picker in the extension's popup.** Click the extension icon
+   to switch between the palettes above; the choice is saved and repaints
+   any open game tab immediately.
 
 ## How a region is recognised
 
@@ -61,8 +65,12 @@ new array.
 `restyle.css` holds `--md-radius` (cell corner radius, 10% of cell width
 against the page's flat 10px).
 
-`restyle.js` holds `PALETTE`; `PALETTE_STRIDE`, the step used to spread its
-colours across region ids; and `MD_MARK_LIGHTNESS` / `MD_MARK_CHROMA`, the
+`palettes.js` holds `PALETTES`, the named colour sets offered in the popup,
+and `DEFAULT_PALETTE_KEY`. Add an entry there to offer another palette — no
+change to `restyle.js` or `popup.js` needed.
+
+`restyle.js` holds `PALETTE_STRIDE`, the step used to spread a palette's
+colours across region ids, and `MD_MARK_LIGHTNESS` / `MD_MARK_CHROMA`, the
 OKLab scale factors applied to a region's colour for its crossed-out state.
 
 Three rules carry the cell radius — the cell itself, the hover/press overlay
