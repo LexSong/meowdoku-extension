@@ -1,12 +1,18 @@
 {
   "manifest_version": 3,
   "name": "Meowdoku Restyle",
-  "version": "1.4.0",
-  "description": "Rounds cell corners as a percentage of cell size instead of the page's flat 10px.",
+  "version": "1.5.0",
+  "description": "Rounds cell corners as a percentage of cell size, and repaints regions on a choice of four palettes.",
+  "permissions": ["storage"],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Meowdoku Restyle"
+  },
   "content_scripts": [
     {
       "matches": ["https://yocox.github.io/meowdoku/*"],
       "css": ["restyle.css"],
+      "js": ["palettes.js", "restyle.js"],
       "run_at": "document_end"
     }
   ]

@@ -23,3 +23,9 @@
 .cell[data-state="4"]::after {
   border-radius: var(--md-radius) !important;
 }
+
+/* Crossed-out cells are dimmed by restyle.js, which recolours a marked
+   cell's inline background with an OKLab-scaled version of its region
+   colour. A CSS `filter` can't do that per-region: it runs in sRGB and reads
+   as a flat grey wash on pale colours instead of a dimmed version of the
+   same hue. See restyle.js for the dim() function. */
