@@ -19,26 +19,19 @@ nothing about the rules or the logic, only how the board looks.
    round exactly where cells get bigger. A percentage holds one shape at every
    size.
 2. **A choice of four region palettes**, replacing the site's own. All four
-   come from `D:\palette-lab`, which scored every one of the 66 pairs a
-   twelve-colour palette makes and pushed the closest pair as far apart as it
-   would go. `5+5+2` is the default and the clearest of the four; `bright12`
-   is built for a screen turned down; `6+6` is the one game.js itself now
-   ships; `5+7` is the most saturated. Click the extension icon to switch.
-   The choice is saved and repaints any open game tab immediately.
+   come from `D:\palette-lab`, which picked them and says what each one is
+   for: `5+5+2` (the default), `bright12`, `6+6` and `5+7`. Click the
+   extension icon to switch. The choice is saved and repaints any open game
+   tab immediately.
 3. **Colours are assigned with a stride of 7**, not in array order. game.js
-   hands out region ids in order, and each palette is listed ring by ring in
-   hue order, so assigning it straight would put adjacent hues on adjacent
-   ids. Stepping by 7 (coprime with the 12-colour palette) spaces consecutive
-   ids 5 slots apart every time, which a per-game random shuffle can't
-   promise.
-4. **Crossed-out cells are dimmed in OKLab.** A cell marked with an X gets a
-   recoloured background: same hue, lightness scaled to 70% and chroma scaled
-   to 50%, computed in OKLab rather than with a CSS `filter`. `filter:
-   brightness() saturate()` runs in sRGB, so on a palette's pale colours it
-   reads as a flat grey wash rather than a dimmed version of the same colour.
-   OKLab separates lightness from chroma along perceptual axes, so scaling
-   each on its own keeps the hue intact and keeps a crossed-out cell
-   recognisable as its region.
+   hands out region ids in order, and each palette is listed in hue order, so
+   assigning it straight would put neighbouring colours on neighbouring ids.
+   Stepping by 7 (coprime with 12) spaces consecutive ids 5 slots apart every
+   time, which a per-game random shuffle can't promise.
+4. **Crossed-out cells are dimmed in OKLab**, lightness to 70% and chroma to
+   50%, rather than with a CSS `filter`. `filter: brightness() saturate()`
+   runs in sRGB and washes pale colours out to grey; OKLab keeps the hue, so
+   the cell still reads as its region.
 
 ## What game.js already does
 
@@ -48,7 +41,9 @@ So a stock page already dims in OKLab and already runs 6+6.
 
 What is left for the extension is the choice. Three of the four palettes are
 ones `game.js` does not ship, and the dimming has to come along because
-`game.js` precomputes its dim table for its own twelve colours only.
+`game.js` precomputes its dim table for its own twelve colours only. Picking
+`6+6` does not reproduce the stock board either: `game.js` baked the stride
+in over the order this extension used then, and it now uses hue order.
 
 ## How a region is recognised
 
@@ -85,8 +80,9 @@ against the page's flat 10px).
 
 `palettes.js` holds `PALETTES`, the named colour sets offered in the popup,
 and `DEFAULT_PALETTE_KEY`. Add an entry there to offer another palette — no
-change to `restyle.js` or `popup.js` needed. List its colours ring by ring,
-each ring in hue order, which is what the stride assignment expects.
+change to `restyle.js` or `popup.js` needed. List its colours in OKLab hue
+order, which the stride expects. palette-lab's README already prints them
+that way, so all four are copied from it as they stand.
 
 `restyle.js` holds `PALETTE_STRIDE`, the step used to spread a palette's
 colours across region ids, and `MD_MARK_LIGHTNESS` / `MD_MARK_CHROMA`, the

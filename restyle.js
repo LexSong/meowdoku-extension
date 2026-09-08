@@ -1,30 +1,21 @@
 "use strict";
 
-// game.js paints a cell by writing an inline background
-// (`cell.style.background = palette[state.regions[r][c] % palette.length]`),
-// and an inline declaration beats any author rule short of !important —
-// which cannot vary per region anyway. game.js also keeps its palettes in
-// top-level `const` bindings, which never land on `window`, so there is
-// nothing to patch from the outside. That leaves one route: read each cell's
-// inline colour back, recognise it as a palette entry, and overwrite it.
+// game.js paints a cell by writing an inline background, and an inline
+// declaration beats any author rule short of !important — which cannot vary
+// per region anyway. Its palettes are top-level `const`s that never land on
+// `window`, so there is nothing to patch. That leaves one route: read each
+// cell's inline colour back, recognise it, and overwrite it.
 
 // Every array below is indexed by region id (mod 12), so a hit at index i
-// means region i no matter which array matched.
-//
-// The first two are what game.js ships today: the live palette and its
-// crossed-out variant, both added when upstream adopted this extension's
-// 6+6 palette and OKLab dimming. Upstream baked the stride-7 permutation
-// into the array itself rather than applying it at paint time, so index i
-// there is still the region id, exactly as in the older arrays below, and
-// colorFor() re-applies the stride to whichever palette the user picked.
-//
-// The last two are what game.js used before the adoption. They cost two
-// lines each and mean a browser still holding a cached older game.js is
-// repainted too.
+// means region i whichever array matched. The first two are what game.js
+// ships today, live and crossed-out; it baked the stride into the array
+// itself, so index i there is still the region id. The last two are what it
+// used before adopting this extension's palette, kept so a cached older
+// game.js is repainted too.
 //
 // If regions stop being recoloured after a site update, check this first.
 // Diff REGION_COLORS and REGION_COLORS_DIM in game.js against the first two
-// arrays here and prepend whatever changed.
+// arrays and prepend whatever changed.
 const ORIGINAL_PALETTES = [
   ["#FF9CA9", "#A45C1D", "#BDC567", "#00865C", "#61CBFB", "#7A60AD",
    "#AB505E", "#F5AA6B", "#777600", "#56D6BC", "#007AAD", "#C7ACFF"],
@@ -50,16 +41,12 @@ for (const palette of ORIGINAL_PALETTES) {
 // changes it — see the chrome.storage.onChanged listener below.
 let PALETTE = PALETTES[DEFAULT_PALETTE_KEY].colors;
 
-// A crossed-out cell dims by scaling OKLab lightness and chroma, not by
-// CSS `filter: brightness() saturate()`. That filter works in sRGB, so on a
-// palette's pale colours it reads as a flat grey wash rather than a dimmed
-// version of the same hue. OKLab separates lightness from chroma along
-// perceptual axes, so scaling each independently keeps the hue intact, so a
-// dimmed pale cell and a dimmed dark cell still read as the same region.
-//
-// Lightness drops to 0.7 and chroma to 0.5 — dim enough that a crossed-out
-// cell is unmistakably not live, while OKLab's separate lightness/chroma
-// axes keep the hue intact so the cell still reads as its region.
+// A crossed-out cell dims by scaling OKLab lightness to 0.7 and chroma to
+// 0.5, not by CSS `filter: brightness() saturate()`. That filter works in
+// sRGB and washes pale colours out to grey; OKLab keeps the hue, so the cell
+// still reads as its region. game.js does the same with a table precomputed
+// for its own twelve colours, which is no use here — this has to dim
+// whichever palette is picked.
 const MD_MARK_LIGHTNESS = 0.7;
 const MD_MARK_CHROMA = 0.5;
 
@@ -130,18 +117,11 @@ function regionIndexOf(cell) {
   return idx === undefined ? -1 : idx;
 }
 
-// game.js hands out region ids in order, and every palette in palettes.js
-// is listed ring by ring in hue order, so id N and id N+1 would land on
-// adjacent hues — the two hardest colours to tell apart next to each other
-// on the board. Stepping by 7 instead of 1 fixes that: 7 is coprime with the
-// 12-colour palette, so the sequence visits every slot exactly once before
-// it repeats, and consecutive ids always land 5 (or 7) slots apart — the
-// largest gap a 12-colour cycle can give two neighbours. A gap that size
-// usually crosses a ring boundary too, so neighbours differ in lightness as
-// well as hue — on all twelve pairs for 5+5+2 and bright12, and on ten of
-// the twelve for 6+6 and 5+7. A per-game random shuffle can't promise any of
-// that; it can just as easily deal two adjacent hues to two consecutive ids
-// as this stride never does.
+// game.js hands out region ids in order, and palettes.js lists colours in hue
+// order, so id N and id N+1 would land on neighbouring colours. Stepping by 7
+// instead of 1 spreads them out: 7 is coprime with 12, so the sequence uses
+// every slot exactly once and consecutive ids always land 5 (or 7) slots
+// apart, which a per-game random shuffle can't promise.
 const PALETTE_STRIDE = 7;
 
 function colorFor(idx, cell) {
